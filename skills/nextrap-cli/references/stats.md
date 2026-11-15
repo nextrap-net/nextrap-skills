@@ -15,7 +15,7 @@
 ### nextrap-cli stats unique-count
 
 ```bash
-nextrap-cli stats unique-count --query 'url=="/api/auth/login"' \
+nextrap-cli stats unique-count --query 'url="*/api/auth/login*"' \
   --field ip -o json
 ```
 <!-- slot: 示例 -->
@@ -30,7 +30,7 @@ nextrap-cli stats unique-count --query 'url=="/api/auth/login"' \
 ### nextrap-cli stats distribution
 
 ```bash
-nextrap-cli stats distribution --query 'url=="/api/auth/login"' \
+nextrap-cli stats distribution --query 'url="*/api/auth/login*"' \
   --by ip --size 5 -o json
 ```
 <!-- slot: 示例 -->
