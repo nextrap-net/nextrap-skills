@@ -1,7 +1,7 @@
 ---
 name: nextrap-cli
-version: 1.0.0
-description: "使用 Nextrap CLI 从 IP、URL 或产品名称调查公共攻击情报：理解用户要看样例、活动、规模还是前后请求，选择必要查询，沿真实日志定位信息继续，解释统计、打码、截断与权限边界。用户要查某个来源 IP、某个接口或某个产品收到的请求，分析日志上下文、做去重和分布统计，或处理 CLI 认证与更新时使用。不负责产品或蜜罐管理、私有数据、收藏、POC 下载、漏洞验证、运维部署和发布流水线；这些需求转平台对应功能或维护者。"
+version: 1.0.3
+description: "使用 Nextrap CLI 从 IP、URL 或产品名称调查公共攻击情报：理解用户要看样例、活动、规模还是前后请求，选择必要查询，沿真实日志定位信息继续，解释统计、打码、截断与权限边界。用户要按名称查产品目录，或查某个来源 IP、接口或产品的请求，分析日志上下文、做去重和分布统计，或处理 CLI 认证与更新时使用。不负责产品或蜜罐管理、私有数据、收藏、POC 下载、漏洞验证、运维部署和发布流水线；这些需求转平台对应功能或维护者。"
 metadata:
   type: [cli-wrapper, workflow]
   verify:
@@ -31,6 +31,7 @@ nextrap-cli --version
 
 - 使用正式 Nextrap CLI：自报名称为 `nextrap-cli`、发布渠道为 `stable`、分发版本为 `public`，默认服务地址为 `https://www.nextrap.net`。Windows 文件名附 `.exe`。
 - 找不到程序或身份不符时停止业务调用，说明需要安装官方 Nextrap CLI；不把同名但接口不同的程序当作可用替代。
+- `product search` 最低需要正式 CLI `v1.0.1`。如果当前版本较旧，先说明版本要求，用户确认升级后再执行。
 - 参数以当前二进制的具体命令帮助为准；命令缺失或版本较旧时先确认版本，不试旧别名、不改用 HTTP 请求绕过 CLI。
 - 已知命令和参数直接使用；仅在用法不确定或收到参数错误时查看相应帮助，不逐项探测整棵命令树。
 - 执行前核对用户目标与实际服务地址；不为了让 Key 可用而擅自改地址。凭证处理读 [auth.md](references/auth.md)。
@@ -49,6 +50,7 @@ nextrap-cli --version
 |---|---|
 | “这个 IP 是哪的？” | 基础归属，读 [ip.md](references/ip.md)；不从归属地推断攻击者身份。 |
 | “这个 IP 这段时间做了什么？” | 活动 → 按需取样 → 必要时上下文，读 [IP 调查流程](references/workflow-ip-investigation.md)。 |
+| “这个产品名在目录里有哪些候选？” | 查询目录，读 [product.md](references/product.md)。 |
 | “这个 URL / 产品收到了什么请求？” | 从条件取样，按问题补统计与前后文，读 [URL / 产品调查流程](references/workflow-url-product-investigation.md)。 |
 | “涉及多少 IP / 国家 / 产品？” | 选一个去重维度，读 [stats.md](references/stats.md)；不是请求总数。 |
 | “主要哪些来源 / 路径 / 类型？” | 选一个分布维度；若还要具体证据，读 [分布下钻流程](references/workflow-distribution-drilldown.md)。 |
@@ -69,6 +71,7 @@ nextrap-cli --version
 | 看同一边界记录前后的请求 | `nextrap-cli log context` |
 | 统计不同 IP、国家或产品数 | `nextrap-cli stats unique-count` |
 | 看 IP、路径、类型或产品分布 | `nextrap-cli stats distribution` |
+| 按名称查产品目录 | `nextrap-cli product search` |
 | 查 IP 归属信息 | `nextrap-cli ip info` |
 | 查 IP 在指定窗口的活动 | `nextrap-cli ip activity` |
 | 检查或更新当前程序 | `nextrap-cli update` |
@@ -87,8 +90,8 @@ nextrap-cli --version
 | 退出码 | 处理 |
 |---:|---|
 | 0 | 调用成功，空集合也成功；按字段与元数据解释结果。 |
-| 1 | 业务拒绝：按错误文案处理权限、额度、频率或资格；不原样重试，不切账号绕过。 |
-| 2 | 参数或版本身份问题：看该命令帮助，补齐真实输入；不猜 ID、不试旧命令。 |
+| 1 | 服务端拒绝，包括无效查询字段、权限、额度、频率或资格问题。按错误文案处理。明确拒绝后停止当前查询。 |
+| 2 | CLI 本地参数校验失败、未知命令或版本身份问题。核对版本和当前命令帮助，补齐真实输入。 |
 | 3 | 认证失败：核对目标环境、Key 来源和有效性；通过认证入口处理，不回显凭证。 |
 | 4 | 网络或响应异常：先核对服务可达性；检索、上下文、解密可能已消费，先查余额并说明不确定性，避免重复扣次。 |
 | 5 | 本机内部错误：保留已脱敏错误信息，检查可执行文件位置或文件权限；不盲目重复业务调用。 |
@@ -107,6 +110,7 @@ CLI 对可安全重试的读取最多尝试 3 次；检索、上下文与解密�
 - [status.md](references/status.md)：查询身份和三项情报余额。
 - [log.md](references/log.md)：查字段、取样、读全文、解密或按同一条结果查看上下文。
 - [stats.md](references/stats.md)：仅需一个维度的去重数或请求量分布。
+- [product.md](references/product.md)：按名称检索产品目录，解释候选和分页。
 - [ip.md](references/ip.md)：IP 基础归属与窗口内活动；按需增加分布。
 - [update.md](references/update.md)：核对官方更新状态或执行已获授权的自更新。
 - [query.md](references/query.md)：编写条件、设置日期/分页/公共范围前读取共享约束。
