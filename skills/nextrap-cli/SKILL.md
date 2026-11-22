@@ -1,6 +1,11 @@
 ---
 name: nextrap-cli
-version: 1.0.4
+version: 1.0.5
+author: Nextrap
+display_name: "Nextrap 攻击情报查询"
+display_name_en: "Nextrap Attack Intelligence"
+description_zh: "使用 Nextrap CLI 按 IP、URL 或产品名称查询公共攻击情报，查看请求日志、上下文与路径统计。"
+description_en: "Use Nextrap CLI to search public attack intelligence by IP, URL, or product name and inspect request logs, context, and path statistics."
 description: "使用 Nextrap CLI 从 IP、URL 或产品名称调查公共攻击情报：理解用户要看样例、活动、规模还是前后请求，选择必要查询，沿真实日志定位信息继续，解释统计、打码、截断与权限边界。用户要按名称查产品目录，或查某个来源 IP、接口或产品的请求，分析日志上下文、做去重和分布统计，或处理 CLI 认证与更新时使用。不负责产品或蜜罐管理、私有数据、收藏、POC 下载、漏洞验证、运维部署和发布流水线；这些需求转平台对应功能或维护者。"
 metadata:
   type: [cli-wrapper, workflow]
