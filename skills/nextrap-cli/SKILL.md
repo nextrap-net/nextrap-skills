@@ -1,12 +1,12 @@
 ---
 name: nextrap-cli
-version: 1.0.5
+version: 1.0.6
 author: Nextrap
 display_name: "Nextrap 攻击情报查询"
 display_name_en: "Nextrap Attack Intelligence"
 description_zh: "使用 Nextrap CLI 按 IP、URL 或产品名称查询公共攻击情报，查看请求日志、上下文与路径统计。"
 description_en: "Use Nextrap CLI to search public attack intelligence by IP, URL, or product name and inspect request logs, context, and path statistics."
-description: "使用 Nextrap CLI 从 IP、URL 或产品名称调查公共攻击情报：理解用户要看样例、活动、规模还是前后请求，选择必要查询，沿真实日志定位信息继续，解释统计、打码、截断与权限边界。用户要按名称查产品目录，或查某个来源 IP、接口或产品的请求，分析日志上下文、做去重和分布统计，或处理 CLI 认证与更新时使用。不负责产品或蜜罐管理、私有数据、收藏、POC 下载、漏洞验证、运维部署和发布流水线；这些需求转平台对应功能或维护者。"
+description: "Use Nextrap CLI to investigate public attack intelligence by IP, URL, or product name. Search the product catalog and request logs, inspect context and path statistics, or manage CLI authentication and updates."
 metadata:
   type: [cli-wrapper, workflow]
   verify:
@@ -35,7 +35,7 @@ nextrap-cli --version
 ```
 
 - 使用正式 Nextrap CLI：自报名称为 `nextrap-cli`、发布渠道为 `stable`、分发版本为 `public`，默认服务地址为 `https://www.nextrap.net`。Windows 文件名附 `.exe`。
-- 找不到程序或身份不符时停止业务调用，说明需要安装官方 Nextrap CLI；不把同名但接口不同的程序当作可用替代。
+- 找不到程序或身份不符时，暂停查询并读取 [CLI 安装指南](references/install.md)，按用户使用的语言引导安装。
 - `product search` 最低需要正式 CLI `v1.0.1`。`log paths` 最低需要正式 CLI `v1.0.2`。如果当前版本较旧，先说明版本要求，用户确认升级后再执行。
 - 参数以当前二进制的具体命令帮助为准；命令缺失或版本较旧时先确认版本，不试旧别名、不改用 HTTP 请求绕过 CLI。
 - 已知命令和参数直接使用；仅在用法不确定或收到参数错误时查看相应帮助，不逐项探测整棵命令树。
