@@ -1,7 +1,7 @@
 # 公共攻击日志
 <!-- reference-type: business -->
 
-> **范围**：字段目录、公共日志取样、已授权全文、单条解密与相邻请求；不查私有数据，不管理收藏，不下载 POC。共享条件和日期约束见 [query.md](query.md)。
+> **范围**：字段目录、公共日志取样、已授权全文、单条解密、路径统计与相邻请求；不查私有数据，不管理收藏，不下载 POC。共享条件和日期约束见 [query.md](query.md)。
 <!-- slot: 范围 -->
 
 ## 命令一览
@@ -13,6 +13,7 @@
 | `nextrap-cli log show` | 读取当前权限允许的完整已存储正文 |
 | `nextrap-cli log decrypt` | 按后台实时资格尝试解密一条记录 |
 | `nextrap-cli log context` | 读取边界记录之前或之后的相邻请求 |
+| `nextrap-cli log paths` | 统计单条日志关联的路径和请求次数 |
 <!-- slot: 命令清单 -->
 
 ### nextrap-cli log fields
@@ -91,6 +92,27 @@ nextrap-cli log context "$LOG_ID" --date "$LOG_DATE" \
 | 方向与数量 | `before/after` 分别取边界前/后最多 24 小时的最近 5 条，后台还可裁切；无分页参数。`total` 可大于 5，是该方向合格邻居数，不自动继续遍历。 |
 | 隔离 | 同来源 IP、同产品及蜜罐；无蜜罐 ID 的旧记录按目标 IP/监听端口隔离，不拼跨产品上下文。 |
 | 消费 | 有结果时可能扣检索次数和返回条数，空结果不据此推断其他窗口也空。 |
+<!-- slot: 参数 -->
+
+### nextrap-cli log paths
+
+用户问“围绕这条日志访问了哪些路径：[一条日志检索结果]”时，从同一个结果取 `id` 和 `create_time`。把 `id` 赋给 `LOG_ID`，把时间的前 10 位日期赋给 `LOG_DATE`。
+
+```bash
+nextrap-cli log paths "$LOG_ID" --date "$LOG_DATE" -o json \
+  --jq '.data | {request_total,returned_path_count:(.items|length),ignored_request_total,has_more,approximate,interval,paths:(.items[:5])}'
+```
+<!-- slot: 示例 -->
+
+| 输入或输出 | 约束 |
+|---|---|
+| 统计范围 | 服务端以同一条日志的来源 IP、产品和蜜罐为范围。已有独立 DSL 条件时，使用 [分布统计](stats.md#nextrap-cli-stats-distribution) 查看该条件下的路径。 |
+| 时间窗 | 默认日志前后各 15 分钟，也可用 `--window 5\|15\|60` 指定前后各几分钟。用户给的是日期范围时，成对传 `--start` 和 `--end`，保持合计跨度在 365 天内。两种范围只能选一种。 |
+| 请求总数 | 用 `data.request_total`，通用响应包装的 `total` 不表示请求数。`items[].value` 是该路径的请求数。`masked=true` 时只按接口返回的显示值解释。 |
+| 列表与趋势 | `has_more=true` 表示超过路径返回上限，结果最多 1,000 条。示例仅展示前 5 条；`returned_path_count` 是接口实际返回的路径条数。`approximate` 只标记路径计数是否可能近似。`interval` 是趋势分桶粒度，如需趋势可直接保留 `data.trend`。 |
+| 未计入路径分布 | `ignored_request_total` 是路径过长、仍计入请求总数的请求数。接口省略此字段时不填成零。 |
+
+退出码为 0 时按实际返回解释。没有记录就报告当前范围的结果。后台指出日志不可用于统计或权限不足时，保留原文案并停止，不换日志或扩大时间窗。
 <!-- slot: 参数 -->
 
 ## 注意事项
