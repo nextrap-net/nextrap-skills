@@ -1,6 +1,6 @@
 ---
 name: nextrap-cli
-version: 1.0.6
+version: 1.0.7
 author: Nextrap
 display_name: "Nextrap 攻击情报查询"
 display_name_en: "Nextrap Attack Intelligence"
@@ -36,7 +36,7 @@ nextrap-cli --version
 
 - 使用正式 Nextrap CLI：自报名称为 `nextrap-cli`、发布渠道为 `stable`、分发版本为 `public`，默认服务地址为 `https://www.nextrap.net`。Windows 文件名附 `.exe`。
 - 找不到程序或身份不符时，暂停查询并读取 [CLI 安装指南](references/install.md)，按用户使用的语言引导安装。
-- `product search` 最低需要正式 CLI `v1.0.1`。`log paths` 最低需要正式 CLI `v1.0.2`。如果当前版本较旧，先说明版本要求，用户确认升级后再执行。
+- `product search` 最低需要正式 CLI `v1.0.1`。`log paths` 最低需要正式 CLI `v1.0.2`。`log products` 最低需要正式 CLI `v1.0.3`。如果当前版本较旧，先说明版本要求，用户确认升级后再执行。
 - 参数以当前二进制的具体命令帮助为准；命令缺失或版本较旧时先确认版本，不试旧别名、不改用 HTTP 请求绕过 CLI。
 - 已知命令和参数直接使用；仅在用法不确定或收到参数错误时查看相应帮助，不逐项探测整棵命令树。
 - 执行前核对用户目标与实际服务地址；不为了让 Key 可用而擅自改地址。凭证处理读 [auth.md](references/auth.md)。
@@ -60,6 +60,7 @@ nextrap-cli --version
 | “涉及多少 IP / 国家 / 产品？” | 选一个去重维度，读 [stats.md](references/stats.md)；不是请求总数。 |
 | “主要哪些来源 / 路径 / 类型？” | 选一个分布维度；若还要具体证据，读 [分布下钻流程](references/workflow-distribution-drilldown.md)。 |
 | “围绕这条日志访问了哪些路径？” | 单条日志的 [路径统计](references/log.md#nextrap-cli-log-paths)。 |
+| “围绕这条日志访问了哪些产品？” | 单条日志的 [产品统计](references/log.md#nextrap-cli-log-products)。 |
 | “这条请求前后在干什么？正文为何不完整？” | 使用同条定位值，按 [business.md](references/business.md) 的上下文、截断、打码判断选动作，再查 [log.md](references/log.md)。 |
 
 ## 按问题选命令
@@ -76,6 +77,7 @@ nextrap-cli --version
 | 尝试解密受限记录 | `nextrap-cli log decrypt` |
 | 看同一边界记录前后的请求 | `nextrap-cli log context` |
 | 查一条日志关联的路径和请求数 | `nextrap-cli log paths` |
+| 查一条日志关联的产品和请求数 | `nextrap-cli log products` |
 | 统计不同 IP、国家或产品数 | `nextrap-cli stats unique-count` |
 | 看 IP、路径、类型或产品分布 | `nextrap-cli stats distribution` |
 | 按名称查产品目录 | `nextrap-cli product search` |
@@ -115,7 +117,7 @@ CLI 对可安全重试的读取最多尝试 3 次；检索、上下文与解密�
 
 - [auth.md](references/auth.md)：保存、清除 Key，或定位凭证优先级与环境配置。
 - [status.md](references/status.md)：查询身份和三项情报余额。
-- [log.md](references/log.md)：查字段、取样、读全文、解密、查看单条日志的路径统计或上下文。
+- [log.md](references/log.md)：查字段、取样、读全文、解密、查看单条日志的路径统计、产品统计或上下文。
 - [stats.md](references/stats.md)：仅需一个维度的去重数或请求量分布。
 - [product.md](references/product.md)：按名称检索产品目录，解释候选和分页。
 - [ip.md](references/ip.md)：IP 基础归属与窗口内活动；按需增加分布。

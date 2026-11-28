@@ -1,7 +1,7 @@
 # 公共攻击日志
 <!-- reference-type: business -->
 
-> **范围**：字段目录、公共日志取样、已授权全文、单条解密、路径统计与相邻请求；不查私有数据，不管理收藏，不下载 POC。共享条件和日期约束见 [query.md](query.md)。
+> **范围**：字段目录、公共日志取样、已授权全文、单条解密、路径统计、产品统计与相邻请求；不查私有数据，不管理收藏，不下载 POC。共享条件和日期约束见 [query.md](query.md)。
 <!-- slot: 范围 -->
 
 ## 命令一览
@@ -14,6 +14,7 @@
 | `nextrap-cli log decrypt` | 按后台实时资格尝试解密一条记录 |
 | `nextrap-cli log context` | 读取边界记录之前或之后的相邻请求 |
 | `nextrap-cli log paths` | 统计单条日志关联的路径和请求次数 |
+| `nextrap-cli log products` | 统计单条日志关联的产品和请求次数 |
 <!-- slot: 命令清单 -->
 
 ### nextrap-cli log fields
@@ -113,6 +114,27 @@ nextrap-cli log paths "$LOG_ID" --date "$LOG_DATE" -o json \
 | 未计入路径分布 | `ignored_request_total` 是路径过长、仍计入请求总数的请求数。接口省略此字段时不填成零。 |
 
 退出码为 0 时按实际返回解释。没有记录就报告当前范围的结果。后台指出日志不可用于统计或权限不足时，保留原文案并停止，不换日志或扩大时间窗。
+<!-- slot: 参数 -->
+
+### nextrap-cli log products
+
+用户问「围绕这条日志访问了哪些产品：[一条日志检索结果]」时，从同一条记录取 `id` 和 `create_time`。把 `id` 赋给 `LOG_ID`，把时间的前 10 位日期赋给 `LOG_DATE`。
+
+```bash
+nextrap-cli log products "$LOG_ID" --date "$LOG_DATE" -o json \
+  --jq '.data | {request_total,returned_product_count:(.items|length),has_more,approximate,interval,products:(.items[:5])}'
+```
+<!-- slot: 示例 -->
+
+| 输入或输出 | 约束 |
+|---|---|
+| 统计范围 | 服务端用锚点日志定位来源 IP 和采集 Agent，只查公共范围。 |
+| 时间窗 | 默认锚点前后各 15 分钟。可用 `--window 5\|15\|60` 改窗口，或成对传 `--start` 和 `--end`（最长一年，包含结束日）。有现成日志锚点时沿用它的实际日期。 |
+| 产品与总数 | `data.request_total` 是范围内请求总数。`items[].value` 是产品请求数，同名产品保留独立条目。`product_id` 保持字符串。打码或历史无有效 ID 时，返回空字符串。 |
+| 列表与趋势 | `has_more` 表示列表截断，`approximate` 表示产品计数可能近似。示例只展示前五项。需要趋势时读取 `data.trend`，`interval` 是分桶粒度。 |
+| 筛选趋势 | 用户指定某个已确认的产品时，`--product-id` 取该统计结果中未打码且非空的 `product_id`。它只筛选趋势，产品列表和总请求数仍按原范围统计。 |
+
+空结果按当前范围回答。后台拒绝时，保留原文案。按现有锚点执行一次，不自动换日志或扩大时间窗。
 <!-- slot: 参数 -->
 
 ## 注意事项
